@@ -17,11 +17,11 @@ import com.example.demo.model.StudentDetails;
 import com.example.demo.service.StudentService;
 
 @RestController
-public class FirstController {
+public class StudentController {
 
 	private StudentService studentService;
 
-	public FirstController(StudentService studentService) {
+	public StudentController(StudentService studentService) {
 		this.studentService = studentService;
 	}
 
@@ -41,9 +41,8 @@ public class FirstController {
 	public ResponseEntity<?> saveOrUpdate(@RequestBody StudentDetails studentDetails) throws Exception {
 		String sid = studentDetails.getSid();
 		StudentDetails exist = studentService.findBysId(sid);
-		System.out.println("student id>>>>>>>>>>>> : "+exist);
 		if(exist!=null) {
-			return new ResponseEntity<ErrorAttributes>(HttpStatus.FORBIDDEN);
+			return new ResponseEntity<ErrorAttributes>(HttpStatus.FOUND);
 		}
 		StudentDetails sd = studentService.save(studentDetails);
 		return new ResponseEntity<StudentDetails>(sd, HttpStatus.OK);
@@ -76,6 +75,9 @@ public class FirstController {
 	@RequestMapping(method = RequestMethod.GET, produces = { "application/json" }, value = { "student/{studentName}" })
 	public ResponseEntity<List<StudentDetails>> getStudentByName(@PathVariable("studentName") String studentName) {
 		List<StudentDetails> sd = studentService.findByStudentName(studentName);
+		if(sd == null) {
+			return new ResponseEntity<List<StudentDetails>>(sd, HttpStatus.NOT_FOUND);
+		}
 		return new ResponseEntity<List<StudentDetails>>(sd, HttpStatus.OK);
 
 	}
